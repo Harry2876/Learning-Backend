@@ -1,19 +1,21 @@
-//mapping Arrays
-const input = [1,2,3,4,5];
+const express = require('express');
 
-const ans = input.map((i) => {
-    return i *2;
-});
+const app = express();
 
-console.log(ans);
 
-//filtering Arrays
+app.use(express.json());
 
-const arr = [1,2,3,4,5];
-const filter = arr.filter( (n) => {
-    if(n % 2 == 0) {
-        return true;
-    } else return false;
+app.post("/health-checkup", (req, res) => {
+    //do something with kidney here
+    const kidneys = req.body.kidneys;
+    const kidneyLength = kidneys.length;
+
+    res.send("Your Kidney length is " + kidneyLength);
 })
 
-console.log(filter);
+//using global catches to handle input error
+app.use((err, req, res, next) => {
+    res.status(500).send("Uh Oh! Something went wrong");
+})
+
+app.listen(3000);
