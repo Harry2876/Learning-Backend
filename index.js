@@ -1,27 +1,58 @@
-const express = require('express');
-const zod = require("zod");
+const express = require("express");
+const jwt = require("jsonwebtoken");
+const jwtPassword = "123456";
 
 const app = express();
 
-//describing the schema for the zod to check
-const schema = zod.array(zod.number());
+const ALL_USERS = [
+    {
+        username: "harsh@gmail.com",
+        password: "123",
+        name: "Harsh Kumar"
+    },
+    {
+        username: "Uday@gmail.com",
+        password: "123456",
+        name: "Uday Kumar"
+    },
+    {
+        username: "alok@gmail.com",
+        password: "0987",
+        name: " Alok Kumar"
+    },
+];
 
-app.use(express.json());
+function userExists(username, password) {
 
-app.post("/health-checkup",
-    (req,
-     res) => {
-    //do something with kidney here
-    const kidneys = req.body.kidneys;
-    const response = schema.safeParse(kidneys)
-    if(!response.success){
-        return res.status(411).json({
-            msg: "Invalid Input"
-        })
-    } else {
-        return res.send({
-            response
-        })
+}
+
+app.post("/signin", (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    if(!userExists(username, password)) {
+        return res.status(403).json({
+            msg: "User Doesn't Exists"
+        });
+    }
+
+    var token = jwt.sign({username: username},"shhhh");
+    return res.json({
+        token,
+    });
+});
+
+app.get("/users", (req, res) => {
+    const token = req.headers.authorization;
+    try {
+        const decoded = jwt.verify(token, jwtPassword);
+        const username = decoded.username;
+
+        //return of this users other than this username
+    } catch (err) {
+        return res.status(403).json({
+            msg: "Invalid Token",
+        });
     }
 })
 
