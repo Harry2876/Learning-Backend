@@ -3,15 +3,16 @@ const jwt = require("jsonwebtoken");
 const jwtPassword = "123456";
 
 const app = express();
+app.use(express.json());
 
 const ALL_USERS = [
     {
         username: "harsh@gmail.com",
-        password: "123",
+        password: "123332",
         name: "Harsh Kumar"
     },
     {
-        username: "Uday@gmail.com",
+        username: "uday@gmail.com",
         password: "123456",
         name: "Uday Kumar"
     },
@@ -23,7 +24,13 @@ const ALL_USERS = [
 ];
 
 function userExists(username, password) {
-
+    let userExists = false;
+    for(let i = 0; i < ALL_USERS.length; i++) {
+        if(ALL_USERS[i].username == username && ALL_USERS[i].password == password){
+            userExists = true;
+        }
+    }
+    return userExists;
 }
 
 app.post("/signin", (req, res) => {
@@ -36,7 +43,7 @@ app.post("/signin", (req, res) => {
         });
     }
 
-    var token = jwt.sign({username: username},"shhhh");
+    var token = jwt.sign({username: username},jwtPassword);
     return res.json({
         token,
     });
@@ -44,16 +51,18 @@ app.post("/signin", (req, res) => {
 
 app.get("/users", (req, res) => {
     const token = req.headers.authorization;
-    try {
         const decoded = jwt.verify(token, jwtPassword);
         const username = decoded.username;
 
-        //return of this users other than this username
-    } catch (err) {
-        return res.status(403).json({
-            msg: "Invalid Token",
-        });
-    }
+        res.json({
+            users: ALL_USERS.filter((value) => {
+                if(value.username == username){
+                    return false;
+                } else {
+                    return true;
+                }
+            })
+        })
 })
 
 app.listen(3000);
